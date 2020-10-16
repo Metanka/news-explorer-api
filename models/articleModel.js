@@ -15,11 +15,10 @@ const articleSchema = new mongoose.Schema({
     required: true,
   },
   date: {
-    type: Date,
-    default: Date.now,
+    type: String,
     required: true,
   },
-  sourse: {
+  source: {
     type: String,
     required: true,
   },
@@ -46,8 +45,10 @@ const articleSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'article',
+    ref: 'user',
+    select: false,
   },
-});
+},
+{ versionKey: false });
 
 module.exports = mongoose.model('articles', articleSchema);
