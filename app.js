@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
+const { celebrate, Joi, errors } = require('celebrate');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { registerUser, login } = require('./controllers/user');
@@ -34,9 +35,20 @@ app.get('/crash-test', () => {
   }, 0);
 });
 // регистрация пользователя
-app.post('/signup', registerUser);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), registerUser);
 // логин, получение токена
-app.post('/signin', login);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
 app.use(auth);
 // подключаем роут со статьями
 app.use('/articles', require('./routes/articleRoute'));
@@ -46,9 +58,10 @@ app.use('/users', require('./routes/userRoute'));
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
-
+// собирает ошибки в логгер
 app.use(errorLogger);
-
+// собирает ошибки валидации
+app.use(errors());
 // здесь обрабатываем все ошибки
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
