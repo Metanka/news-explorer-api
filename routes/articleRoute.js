@@ -24,7 +24,7 @@ routerArticles.post('/', celebrate({
 // ищет стотью по id и удаляет
 routerArticles.delete('/:articleId', celebrate({
   body: Joi.object().keys({
-    _id: Joi.string().alphanum().length(24).hex(),
+    _id: Joi.string().alphanum().hex(),
   }),
 }), deleteArticle);
 

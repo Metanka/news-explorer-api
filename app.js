@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { registerUser, login } = require('./controllers/user');
 const NotFoundError = require('./errors/notFound');
@@ -63,16 +63,7 @@ app.use(errorLogger);
 // собирает ошибки валидации
 app.use(errors());
 // здесь обрабатываем все ошибки
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-    });
-});
+app.use(errorHandler);
 
 // начинаем прослушивать подключения на PORT
 app.listen(PORT, () => {

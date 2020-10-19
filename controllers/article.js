@@ -30,10 +30,13 @@ const createArticle = (req, res, next) => {
 const deleteArticle = (req, res, next) => {
   const owner = req.user._id;
   Article.findOne({ _id: req.params.articleId }).select('+owner')
-    .orFail(() => new NotFoundError('Пользователь не найден'))
+    .orFail()
+    .catch(() => {
+      throw new NotFoundError(`Статья с id - ${req.params.articleId} не найдена.`);
+    })
     .then((article) => {
       if (String(article.owner) !== owner) throw new ForbiddenError('Недостаточно прав на удаление этой статьи.');
-      return Article.findByIdAndDelete(article._id);
+      return Article.deleteOne(article);
     })
     .then(() => res.send('Статья удалена из избранного.'))
     .catch(next);
