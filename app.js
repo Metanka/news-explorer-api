@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const auth = require('./middlewares/auth');
@@ -23,7 +24,7 @@ mongoose.connect(mongoDB, {
 
 // подключаем логгер запросов
 app.use(requestLogger);
-
+app.use(cors());
 // для получения отправленных данных необходимо создать парсер
 app.use(bodyParser.json());
 // extended: true указывает, что req.body будет содержать значения любого типа, не только строки.
