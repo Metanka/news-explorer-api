@@ -4,11 +4,12 @@ const ForbiddenError = require('../errors/forbidden');
 const NotFoundError = require('../errors/notFound');
 
 // получаем все статьи
-const getArticles = (req, res, next) => Article.find({})
-// populate() это метод Mongoose для замены идентификаторов объектами
-  .populate('article')
-  .then((articles) => res.status(200).send(articles))
-  .catch(next);
+const getArticles = (req, res, next) => {
+  const owner = req.user._id;
+  Article.find({ owner })
+    .then((articles) => res.send(articles))
+    .catch((err) => next(new BadRequest(err)));
+};
 
 // создаем статью в базе данных
 const createArticle = (req, res, next) => {
